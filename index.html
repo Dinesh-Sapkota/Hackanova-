@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicResolve - Community Issue Reporting Platform</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+    <!-- Landing Page -->
+    <div id="landing-page" class="page active">
+        <nav class="landing-nav">
+            <div class="nav-container">
+                <div class="logo">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                        <circle cx="16" cy="16" r="14" stroke="#FF6B35" stroke-width="2" fill="none"/>
+                        <path d="M16 8L20 16L16 24L12 16Z" fill="#FF6B35"/>
+                    </svg>
+                    <span>CivicResolve</span>
+                </div>
+                <div class="nav-actions">
+                    <button class="btn-text" onclick="showAuthModal('citizen')">Sign In</button>
+                    <button class="btn-primary" onclick="showAuthModal('official')">Official Login</button>
+                </div>
+            </div>
+        </nav>
+
+        <section class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">Building Better Communities Together</h1>
+                <p class="hero-subtitle">Report civic issues, track progress, and make your neighborhood better</p>
+                <div class="hero-actions">
+                    <button class="btn-large btn-primary" onclick="showAuthModal('citizen')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        Get Started as Citizen
+                    </button>
+                    <button class="btn-large btn-secondary" onclick="quickAccess()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                        </svg>
+                        Quick Access (Skip Login)
+                    </button>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">2,847</div>
+                    <div class="stat-label">Issues Resolved</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">3.2</div>
+                    <div class="stat-label">Days Avg Response</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">89%</div>
+                    <div class="stat-label">Resolution Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">12,450</div>
+                    <div class="stat-label">Active Citizens</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Citizen Dashboard -->
+    <div id="citizen-dashboard" class="page">
+        <nav class="dashboard-nav">
+            <div class="nav-container">
+                <div class="logo">
+                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                        <circle cx="16" cy="16" r="14" stroke="#FF6B35" stroke-width="2" fill="none"/>
+                        <path d="M16 8L20 16L16 24L12 16Z" fill="#FF6B35"/>
+                    </svg>
+                    <span>CivicResolve</span>
+                </div>
+                <div class="nav-search">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="M21 21l-4.35-4.35"/>
+                    </svg>
+                    <input type="text" placeholder="Search issues..." id="searchInput">
+                </div>
+                <div class="nav-actions">
+                    <button class="icon-btn notification-btn" onclick="toggleNotifications()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                        </svg>
+                        <span class="badge">3</span>
+                    </button>
+                    <div class="user-menu" onclick="toggleUserMenu()">
+                        <div class="user-avatar">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                        </div>
+                        <div class="user-dropdown" id="userDropdown">
+                            <a href="#" onclick="showPage('citizen-dashboard')">Dashboard</a>
+                            <a href="#" onclick="showMyComplaints()">My Issues</a>
+                            <a href="#">Settings</a>
+                            <a href="#">Help</a>
+                            <a href="#" onclick="logout()">Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="dashboard-container">
+            <div class="sidebar">
+                <div class="sidebar-menu">
+                    <a href="#" class="menu-item active" onclick="showCitizenView('feed')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"/>
+                            <rect x="14" y="3" width="7" height="7"/>
+                            <rect x="14" y="14" width="7" height="7"/>
+                            <rect x="3" y="14" width="7" height="7"/>
+                        </svg>
+                        <span>Feed</span>
+                    </a>
+                    <a href="#" class="menu-item" onclick="showCitizenView('map')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        <span>Map View</span>
+                    </a>
+                    <a href="#" class="menu-item" onclick="showMyComplaints()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                        <span>My Issues</span>
+                    </a>
+                </div>
+
+                <div class="filter-panel">
+                    <h3>Filters</h3>
+                    <div class="filter-section">
+                        <label>Status</label>
+                        <select id="statusFilter" onchange="applyFilters()">
+                            <option value="all">All Status</option>
+                            <option value="Open">Open</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Resolved">Resolved</option>
+                        </select>
+                    </div>
+                    <div class="filter-section">
+                        <label>Category</label>
+                        <select id="categoryFilter" onchange="applyFilters()">
+                            <option value="all">All Categories</option>
+                            <option value="Pothole">Pothole</option>
+                            <option value="Garbage">Garbage</option>
+                            <option value="Streetlight">Streetlight</option>
+                            <option value="Water">Water</option>
+                            <option value="Drainage">Drainage</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <div id="citizenFeed" class="citizen-view active">
+                    <div class="content-header">
+                        <h2>Recent Issues</h2>
+                        <button class="btn-primary" onclick="openReportModal()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"/>
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                            </svg>
+                            Report New Issue
+                        </button>
+                    </div>
+
+                    <div class="featured-carousel">
+                        <div class="carousel-container" id="featuredCarousel"></div>
+                    </div>
+
+                    <div class="issues-grid" id="issuesGrid"></div>
+                </div>
+
+                <div id="citizenMap" class="citizen-view">
+                    <div class="content-header">
+                        <h2>Issues Map</h2>
+                        <div class="map-controls">
+                            <label class="toggle-label">
+                                <input type="checkbox" id="heatmapToggle" onchange="toggleHeatmap()">
+                                <span>Heatmap</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div id="map" class="map-container"></div>
+                </div>
+
+                <div id="myComplaints" class="citizen-view">
+                    <div class="content-header">
+                        <h2>My Reported Issues</h2>
+                        <select id="myComplaintsFilter" onchange="filterMyComplaints()">
+                            <option value="all">All</option>
+                            <option value="Open">Open</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Resolved">Resolved</option>
+                        </select>
+                    </div>
+                    <div class="issues-list" id="myComplaintsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Official Dashboard -->
+    <div id="official-dashboard" class="page">
+        <nav class="dashboard-nav">
+            <div class="nav-container">
+                <div class="logo">
+                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                        <circle cx="16" cy="16" r="14" stroke="#FF6B35" stroke-width="2" fill="none"/>
+                        <path d="M16 8L20 16L16 24L12 16Z" fill="#FF6B35"/>
+                    </svg>
+                    <span>CivicResolve</span>
+                    <span class="badge-official">Official</span>
+                </div>
+                <div class="nav-info">
+                    <span id="officialName">Officer Dashboard</span>
+                </div>
+                <div class="nav-actions">
+                    <button class="btn-text" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="dashboard-container">
+            <div class="sidebar">
+                <div class="sidebar-menu">
+                    <a href="#" class="menu-item active" onclick="showOfficialView('overview')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"/>
+                            <rect x="14" y="3" width="7" height="7"/>
+                            <rect x="14" y="14" width="7" height="7"/>
+                            <rect x="3" y="14" width="7" height="7"/>
+                        </svg>
+                        <span>Overview</span>
+                    </a>
+                    <a href="#" class="menu-item" onclick="showOfficialView('manage')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                        <span>Manage Issues</span>
+                    </a>
+                    <a href="#" class="menu-item" onclick="showOfficialView('map')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        <span>Map Dashboard</span>
+                    </a>
+                    <a href="#" class="menu-item" onclick="showOfficialView('analytics')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="20" x2="12" y2="10"/>
+                            <line x1="18" y1="20" x2="18" y2="4"/>
+                            <line x1="6" y1="20" x2="6" y2="16"/>
+                        </svg>
+                        <span>Analytics</span>
+                    </a>
+                    <a href="#" class="menu-item" onclick="showOfficialView('summary')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 7h16M4 12h16M4 17h10"/>
+                        </svg>
+                        <span>Summary Generator</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <div id="officialOverview" class="official-view active">
+                    <h2>Dashboard Overview</h2>
+                    <div class="stats-grid-large" id="officialStats"></div>
+                    <div class="recent-activity">
+                        <h3>Recent Activity</h3>
+                        <div id="recentActivityList"></div>
+                    </div>
+                </div>
+
+                <div id="officialManage" class="official-view">
+                    <div class="content-header">
+                        <h2>Manage Complaints</h2>
+                        <div class="action-buttons">
+                            <button class="btn-secondary" onclick="exportComplaints()">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="7 10 12 15 17 10"/>
+                                    <line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
+                                Export CSV
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="complaints-table" id="complaintsTable"></table>
+                    </div>
+                </div>
+
+                <div id="officialMap" class="official-view">
+                    <h2>Geographic Distribution</h2>
+                    <div id="officialMapContainer" class="map-container"></div>
+                </div>
+
+                <div id="officialAnalytics" class="official-view">
+                    <h2>Performance Analytics</h2>
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <h3>Issues by Category</h3>
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Resolution Trends</h3>
+                            <canvas id="trendsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="officialSummary" class="official-view">
+                    <h2>Summary Generator</h2>
+                    <div class="summary-tool">
+                        <div class="form-group">
+                            <label>Select Complaint</label>
+                            <select id="summaryComplaintSelect"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Target Language</label>
+                            <select id="languageSelect">
+                                <option value="en">English</option>
+                                <option value="hi">Hindi</option>
+                                <option value="ta">Tamil</option>
+                                <option value="te">Telugu</option>
+                                <option value="mr">Marathi</option>
+                                <option value="gu">Gujarati</option>
+                                <option value="bn">Bengali</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Summary Length</label>
+                            <input type="range" id="summaryLength" min="1" max="3" value="2">
+                            <div class="range-labels">
+                                <span>Short</span>
+                                <span>Medium</span>
+                                <span>Long</span>
+                            </div>
+                        </div>
+                        <button class="btn-primary" onclick="generateSummary()">Generate Summary</button>
+                        <div id="summaryOutput" class="summary-output"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modals -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div id="citizenAuth" class="auth-container">
+                <h2>Welcome to CivicResolve</h2>
+                <div class="auth-tabs">
+                    <button class="auth-tab active" onclick="switchAuthTab('quick')">Quick Access</button>
+                    <button class="auth-tab" onclick="switchAuthTab('signup')">Create Account</button>
+                </div>
+                <div id="quickAccessForm" class="auth-form active">
+                    <p class="auth-info">Start reporting issues right away without creating an account. Your privacy is protected.</p>
+                    <button class="btn-primary btn-full" onclick="quickAccess()">Continue Anonymously</button>
+                </div>
+                <div id="signupForm" class="auth-form">
+                    <input type="text" placeholder="Full Name" class="form-control">
+                    <input type="email" placeholder="Email Address" class="form-control">
+                    <input type="tel" placeholder="Phone Number" class="form-control">
+                    <input type="text" placeholder="Address" class="form-control">
+                    <select class="form-control">
+                        <option>Select Your Area</option>
+                        <option>Downtown</option>
+                        <option>Midtown</option>
+                        <option>Residential</option>
+                    </select>
+                    <button class="btn-primary btn-full" onclick="citizenSignup()">Create Account</button>
+                    <button class="btn-text btn-full" onclick="quickAccess()">Skip for Now</button>
+                </div>
+            </div>
+            <div id="officialAuth" class="auth-container" style="display:none;">
+                <h2>Official Login</h2>
+                <div class="auth-form">
+                    <input type="text" id="officialId" placeholder="Official ID" class="form-control">
+                    <input type="email" id="officialEmail" placeholder="Email Address" class="form-control">
+                    <input type="password" id="officialPassword" placeholder="Password" class="form-control">
+                    <button class="btn-primary btn-full" onclick="officialLogin()">Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Issue Modal -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content modal-large">
+            <button class="modal-close" onclick="closeReportModal()">&times;</button>
+            <h2>Report New Issue</h2>
+            <div class="wizard-progress">
+                <div class="wizard-step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Category</div>
+                </div>
+                <div class="wizard-step" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Photo</div>
+                </div>
+                <div class="wizard-step" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Location</div>
+                </div>
+                <div class="wizard-step" data-step="4">
+                    <div class="step-number">4</div>
+                    <div class="step-label">Details</div>
+                </div>
+                <div class="wizard-step" data-step="5">
+                    <div class="step-number">5</div>
+                    <div class="step-label">Review</div>
+                </div>
+            </div>
+            <div class="wizard-content">
+                <div id="step1" class="wizard-panel active">
+                    <h3>Select Issue Category</h3>
+                    <div class="category-grid" id="categoryGrid"></div>
+                </div>
+                <div id="step2" class="wizard-panel">
+                    <h3>Upload Photo</h3>
+                    <div class="upload-area" id="uploadArea">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <polyline points="21 15 16 10 5 21"/>
+                        </svg>
+                        <p>Drag and drop your photo here</p>
+                        <p class="upload-hint">or click to browse</p>
+                        <input type="file" id="photoInput" accept="image/*" style="display:none;">
+                    </div>
+                    <div id="photoPreview" class="photo-preview"></div>
+                </div>
+                <div id="step3" class="wizard-panel">
+                    <h3>Specify Location</h3>
+                    <input type="text" id="locationInput" class="form-control" placeholder="Enter location or address">
+                    <div id="locationMap" class="mini-map"></div>
+                </div>
+                <div id="step4" class="wizard-panel">
+                    <h3>Describe the Issue</h3>
+                    <input type="text" id="issueTitle" class="form-control" placeholder="Brief title" maxlength="100">
+                    <textarea id="issueDescription" class="form-control" placeholder="Detailed description" rows="6" maxlength="500"></textarea>
+                    <div class="char-counter"><span id="charCount">0</span>/500</div>
+                </div>
+                <div id="step5" class="wizard-panel">
+                    <h3>Review Your Report</h3>
+                    <div id="reviewContent" class="review-content"></div>
+                </div>
+            </div>
+            <div class="wizard-actions">
+                <button class="btn-secondary" onclick="prevStep()" id="prevBtn" style="display:none;">Previous</button>
+                <button class="btn-primary" onclick="nextStep()" id="nextBtn">Next</button>
+                <button class="btn-primary" onclick="submitReport()" id="submitBtn" style="display:none;">Submit Report</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Complaint Details Modal -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content modal-large">
+            <button class="modal-close" onclick="closeDetailsModal()">&times;</button>
+            <div id="complaintDetails"></div>
+        </div>
+    </div>
+
+    <!-- Help Widget -->
+    <div class="help-widget" id="helpWidget">
+        <button class="help-toggle" onclick="toggleHelp()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+        </button>
+        <div class="help-panel" id="helpPanel">
+            <div class="help-header">
+                <h3>Help &amp; Support</h3>
+                <button onclick="toggleHelp()">&times;</button>
+            </div>
+            <div class="help-content" id="helpContent"></div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Floating Action Button -->
+    <button class="fab" id="fab" onclick="openReportModal()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+    </button>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
